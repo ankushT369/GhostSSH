@@ -33,8 +33,7 @@ void ghost_ws_handler(struct mg_connection *ws, int ev, void *ev_data) {
     } else if (ev == MG_EV_WS_MSG) {
         struct mg_ws_message* wm = (struct mg_ws_message *)ev_data;
         struct mg_connection* tcp = (struct mg_connection *)ws->fn_data;
-        fwrite(wm->data.buf, 1, wm->data.len, stdout);
-        printf("\n");
+        MG_DEBUG(("Data from websocket in CLIENT mode: %.*s", wm->data.len, wm->data.buf));
 
         if (wm) {
             mg_send(tcp, wm->data.buf, wm->data.len);
