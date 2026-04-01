@@ -27,3 +27,67 @@ GhostSSH is:
 * **Transparent** — works with standard SSH clients
 
 It does not replace SSH or require changes to the SSH server—only provides a flexible transport layer on top.
+
+
+
+## Build Options
+
+> Note: The project is in its inital phase recommended to build for linux amd64 or WSL
+
+### 1. Default Build (Linux, dynamic linking)
+```bash
+make
+```
+
+Output:
+
+```
+bin/ghost-linux-amd64
+```
+
+
+
+### 2. Static Build (Linux, glibc)
+
+```bash
+make static
+```
+
+Output:
+
+```
+bin/ghost-linux-amd64-static
+```
+
+
+
+### 3. Portable Build (Linux, fully static)
+
+This build uses musl and produces a fully static binary that works across most Linux distributions.
+
+```bash
+make musl
+```
+
+Output:
+
+```
+bin/ghost-linux-amd64-musl
+```
+
+
+
+### 4. Windows Build (cross-compiled)
+> Note: TLS support is currently disabled in the Windows build.
+
+```bash
+make win
+```
+
+Output:
+
+```
+bin/ghost-windows-amd64.exe
+```
+
+
