@@ -60,3 +60,5 @@ obj/
 ghost
 s*
 c*
+scripts/openssl-*
+*.tar.gz
