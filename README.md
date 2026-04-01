@@ -28,7 +28,83 @@ GhostSSH is:
 
 It does not replace SSH or require changes to the SSH server—only provides a flexible transport layer on top.
 
+## How to use
 
+###  1. Start GhostSSH Server
+
+Run the GhostSSH server on your machine (where `sshd` is running):
+
+```bash
+./bin/ghost-linux-amd64 server --port 7777
+```
+
+<p align="center">
+  <img src="docs/step1.png" alt="GhostSSH" width="70%" />
+</p>
+
+
+> NOTE: Make sure SSH is running on port 22 (or specify using `--ssh`)
+
+
+###  2. Expose Server using ngrok
+
+Since GhostSSH uses WebSockets over HTTP, you can expose it using ngrok:
+
+```bash
+ngrok http 7777
+```
+
+<p align="center">
+  <img src="docs/step2.png" alt="GhostSSH" width="70%" />
+</p>
+
+**Copy the generated *HTTPS URL* (e.g., `https://xxxxx.ngrok-free.dev`)**
+
+
+###  3. Start GhostSSH Client
+
+On the client machine, connect to the server using the ngrok URL:
+
+```bash
+./bin/ghost-linux-amd64 client \
+  --connect https://your-ngrok-url.ngrok-free.dev \
+  --port 8888
+```
+
+**This creates a local TCP port (`8888`) for SSH access**
+
+
+###  4. Connect via SSH
+
+Now use standard SSH to connect:
+
+```bash
+ssh ankush@localhost -p 8888
+```
+<p align="center">
+  <img src="docs/step4.png" alt="GhostSSH" width="70%" />
+</p>
+
+**You are now connected to the remote machine through GhostSSH!**
+
+
+### Flow Summary
+
+```text
+SSH Client (localhost:8888)
+        ↓
+GhostSSH Client
+        ↓ (WSS over HTTPS via ngrok)
+GhostSSH Server
+        ↓
+sshd (localhost:22)
+```
+
+
+#### Notes
+* ngrok is used only to expose the server publicly
+* GhostSSH itself handles the tunneling over WebSocket (WSS)
+* Works in restricted networks where only HTTPS (port 443) is allowed
 
 ## Build Options
 
@@ -89,5 +165,3 @@ Output:
 ```
 bin/ghost-windows-amd64.exe
 ```
-
-
