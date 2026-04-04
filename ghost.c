@@ -16,11 +16,15 @@
 
 #include "ghost.h"
 
+#include <signal.h>
+
 int mode = -1;
 const char* proto_str[LIMIT] = { "tcp", "udp", "http", "ws" };
 
 char url_buffer[MAX_LEN]; // global url buffer
 int upgrade_done = 0;
+
+static int s_signo = 0;
 
 // Verbosity levels
 static int verbosity_level = 0;  // 0 = quiet, 1 = info, 2 = debug, 3 = verbose
@@ -32,11 +36,18 @@ ghost_config config = {
     .ws_url = "",
 };
 
+
+
 /* static declaration */
+static void signal_handler(int signo);
+static void ghost_set_verbosity(int level);
 static void ghost_parse_args(int argc, char* arg[]);
 static void ghost_print_usage();
-static void ghost_set_verbosity(int level);
 static void ghost_print_usage();
+
+static void signal_handler(int signo) {
+  s_signo = signo;
+}
 
 static void ghost_set_verbosity(int level) {
     verbosity_level = level;
@@ -186,11 +197,20 @@ void ghost_tcp_handler(struct mg_connection *tcp, int ev, void *ev_data) {
     if (ev == MG_EV_ACCEPT) {
         MG_INFO(("Client accepted via TCP successfully"));
         ghost_tls_handshake(tcp);
+
+        return ;
     } else if (ev == MG_EV_CONNECT) {
         upgrade_done = 1;
         MG_INFO(("Connected to sshd successfully"));
+
+        return ;
     }
     else if (ev == MG_EV_CLOSE) {
+        if (s_signo) {
+            MG_INFO(("Server closing..."));
+            return;
+        }
+
         MG_INFO(("Client disconnected"));
     }
     else if (ev == MG_EV_READ) {
@@ -209,8 +229,12 @@ void ghost_tcp_handler(struct mg_connection *tcp, int ev, void *ev_data) {
             mg_ws_send(ws, tcp->recv.buf, tcp->recv.len, WEBSOCKET_OP_BINARY);
             mg_iobuf_del(&tcp->recv, 0, tcp->recv.len);
         }
+
+        return ;
     } else if (ev == MG_EV_ERROR) {
         MG_ERROR(("CLIENT error: %s", (char *) ev_data));
+
+        return ;
     }
 }
 
@@ -231,6 +255,10 @@ int main(int argc, char* argv[]) {
     mg_mgr_init(&mgr);
 
     struct mg_connection *conn = NULL;
+
+    /* Register a signal handler for SIGINT (Ctrl + C) */
+    signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
 
     if (mode == SERVER) {
         /* create HTTP listener */
@@ -255,7 +283,7 @@ int main(int argc, char* argv[]) {
     MG_INFO(("Ghost is running. Press Ctrl+C to stop"));
     
     /* blocking wait */
-    for (;;) {
+    while (!s_signo) {
         mg_mgr_poll(&mgr, -1);
     }
 
