@@ -240,7 +240,8 @@ void ghost_tcp_handler(struct mg_connection *tcp, int ev, void *ev_data) {
 
 /**
  * ghost server --port 7777 --ssh 9876 (by default its 22 because sshd runs on 22)
- * ghost client --connect https://your_tunnel_url.com --port 8888 (in this port your ssh will connect e.g.: ssh hostname@localost -p 8888)
+ * ghost client --connect https://your_tunnel_url.com --port 8888 
+ * (in this port your ssh will connect e.g.: ssh hostname@localost -p 8888)
  */
 int main(int argc, char* argv[]) {
     if (argc <= 1) {
