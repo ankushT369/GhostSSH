@@ -25,7 +25,7 @@ void ghost_http_handler(struct mg_connection *http, int ev, void *ev_data) {
         }
     } else if (ev == MG_EV_WS_OPEN) {
         MG_INFO(("WebSocket connection is successfully established"));
-        create_local_url(TCP, SSH_PORT);
+        create_local_url(TCP, config.sshd_port);
         struct mg_connection *tcp = mg_connect(http->mgr,
                 url_buffer, ghost_tcp_handler, NULL);
 
