@@ -1,7 +1,7 @@
 # Architecture
 
 <p align="center">
-  <img src="docs/architecture1.png" alt="GhostSSH" width="70%" />
+  <img src="architecture1.png" alt="GhostSSH" width="70%" />
 </p>
 
 
