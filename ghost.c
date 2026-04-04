@@ -43,7 +43,6 @@ static void signal_handler(int signo);
 static void ghost_set_verbosity(int level);
 static void ghost_parse_args(int argc, char* arg[]);
 static void ghost_print_usage();
-static void ghost_print_usage();
 
 static void signal_handler(int signo) {
   s_signo = signo;
