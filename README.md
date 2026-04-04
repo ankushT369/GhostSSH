@@ -1,4 +1,5 @@
-# GhostSSH
+# GhostSSH [![Build Status](https://github.com/ankushT369/GhostSSH/actions/workflows/check-build.yml/badge.svg)](https://github.com/ankushT369/GhostSSH/actions?query=workflow%3AC)
+
 **GhostSSH Lightweight SSH-over-HTTPS proxy for secure and firewall-friendly remote access**
 
 <p align="center">
