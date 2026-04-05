@@ -8,9 +8,18 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
-    - name: make
+
+    - name: Build GhostSSH
       run: make
+
+    - name: Make test script executable
+      run: chmod +x test/test-cli.sh
+
+    - name: Run CLI test
+      env:
+        GHOST: "./bin/ghost-linux-amd64"
+      run: ./test/test-cli.sh
