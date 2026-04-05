@@ -206,7 +206,7 @@ void ghost_tcp_handler(struct mg_connection *tcp, int ev, void *ev_data) {
     }
     else if (ev == MG_EV_CLOSE) {
         if (s_signo) {
-            MG_INFO(("Server closing..."));
+            MG_INFO(("Shutting down client..."));
             return;
         }
 

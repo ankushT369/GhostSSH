@@ -41,5 +41,7 @@ void ghost_http_handler(struct mg_connection *http, int ev, void *ev_data) {
         if (tcp) {
             mg_send(tcp, wm->data.buf, wm->data.len);
         }
+    } else if (ev == MG_EV_CLOSE) {
+        MG_INFO(("Shutting down server..."));
     }
 }
