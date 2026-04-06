@@ -15,8 +15,12 @@ else
 fi
 
 # If CI sets GHOST, use that. Otherwise use detected default
-GHOST="${GHOST:-$DEFAULT_GHOST}"
-
+if [ -n "$GHOST" ] && [ -f "$GHOST" ]; then
+    echo "[TEST] Using provided GHOST: $GHOST"
+else
+    GHOST="$DEFAULT_GHOST"
+    echo "[TEST] Using default binary: $GHOST"
+fi
 SERVER_PORT=7777
 CLIENT_PORT=8888
 WS_URL="ws://127.0.0.1:$SERVER_PORT"
