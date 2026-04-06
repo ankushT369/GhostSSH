@@ -58,6 +58,26 @@ musl:
 	LDFLAGS="$(MUSL_LDFLAGS) -static"
 
 # =========================================================
+# MACOS (ARM64 - Apple Silicon)
+# =========================================================
+MAC_CC = clang
+MAC_OPENSSL_DIR = /opt/homebrew/opt/openssl@3
+
+MAC_CFLAGS = $(CFLAGS_BASE) $(TLS_OPENSSL) -I$(MAC_OPENSSL_DIR)/include
+MAC_LDFLAGS = $(MAC_OPENSSL_DIR)/lib/libssl.a \
+              $(MAC_OPENSSL_DIR)/lib/libcrypto.a \
+              -ldl -lpthread
+
+MAC_BIN = $(BIN_DIR)/ghost-macos-arm64
+
+mac:
+	$(MAKE) build \
+	CC=$(MAC_CC) \
+	BIN=$(MAC_BIN) \
+	CFLAGS="$(MAC_CFLAGS)" \
+	LDFLAGS="$(MAC_LDFLAGS)"
+
+# =========================================================
 # WINDOWS
 # =========================================================
 win:
