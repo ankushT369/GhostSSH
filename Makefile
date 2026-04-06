@@ -25,7 +25,7 @@ MUSL_LDFLAGS = -L$(MUSL_OPENSSL_DIR)/lib64 -lssl -lcrypto
 LINUX_BIN = $(BIN_DIR)/ghost-linux-amd64
 STATIC_BIN = $(BIN_DIR)/ghost-linux-amd64-static
 MUSL_BIN = $(BIN_DIR)/ghost-linux-amd64
-WIN_BIN = $(BIN_DIR)/ghost-windows-amd64.exe
+WIN_BIN = $(BIN_DIR)/ghost-win-amd64.exe
 
 # =========================================================
 # DEFAULT TARGET (Linux dynamic)
@@ -78,14 +78,14 @@ mac:
 	LDFLAGS="$(MAC_LDFLAGS)"
 
 # =========================================================
-# WINDOWS
+# WINDOWS (make win) or (make win tls=1) in this case you will need openssl compiler static libs for x86_64-w64-mingw32
 # =========================================================
 win:
 	$(MAKE) build \
 	CC=$(WIN_CC) \
 	BIN=$(WIN_BIN) \
-	CFLAGS="$(CFLAGS_BASE) $(TLS_NONE)" \
-	LDFLAGS="-lws2_32 -static -static-libgcc"
+	CFLAGS="$(CFLAGS_BASE) $(if $(tls),$(TLS_OPENSSL),$(TLS_NONE))" \
+	LDFLAGS="$(if $(tls),-lssl -lcrypto -lws2_32 -lcrypt32,-lws2_32) -static -static-libgcc"
 
 # =========================================================
 # BUILD CORE
