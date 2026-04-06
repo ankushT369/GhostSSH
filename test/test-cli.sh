@@ -1,13 +1,29 @@
 #!/bin/bash
 
-# If CI sets GHOST, use that. Otherwise use local path.
-GHOST="${GHOST:-./bin/ghost-linux-amd64}"
+set -e
+
+# Detect OS
+OS="$(uname -s)"
+
+if [ "$OS" = "Darwin" ]; then
+    DEFAULT_GHOST="./bin/ghost-macos-arm64"
+elif [ "$OS" = "Linux" ]; then
+    DEFAULT_GHOST="./bin/ghost-linux-amd64"
+else
+    echo "[ERROR] Unsupported OS: $OS"
+    exit 1
+fi
+
+# If CI sets GHOST, use that. Otherwise use detected default
+GHOST="${GHOST:-$DEFAULT_GHOST}"
 
 SERVER_PORT=7777
 CLIENT_PORT=8888
 WS_URL="ws://127.0.0.1:$SERVER_PORT"
 
+echo "[TEST] OS detected: $OS"
 echo "[TEST] Using binary: $GHOST"
+
 if [ ! -f "$GHOST" ]; then
     echo "[ERROR] Ghost binary not found at: $GHOST"
     exit 1
