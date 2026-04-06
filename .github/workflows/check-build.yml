@@ -20,7 +20,7 @@ jobs:
     - name: Build GhostSSH
       run: |
         if [ "$RUNNER_OS" = "macOS" ]; then 
-          make build \
+          make mac \
             CC=gcc \
             BIN=bin/ghost-macos-arm64 \
             CFLAGS="-Wall -Wextra -g -DMG_TLS=MG_TLS_OPENSSL -I$(brew --prefix openssl)/include" \
