@@ -24,7 +24,7 @@ const char* proto_str[LIMIT] = { "tcp", "udp", "http", "ws" };
 char url_buffer[MAX_LEN]; // global url buffer
 int upgrade_done = 0;
 
-static int s_signo = 0;
+int s_signo = 0;
 
 // Verbosity levels
 static int verbosity_level = 0;  // 0 = quiet, 1 = info, 2 = debug, 3 = verbose

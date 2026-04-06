@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mongoose.h"
 #include "ghost.h"
 
@@ -42,6 +43,11 @@ void ghost_http_handler(struct mg_connection *http, int ev, void *ev_data) {
             mg_send(tcp, wm->data.buf, wm->data.len);
         }
     } else if (ev == MG_EV_CLOSE) {
-        MG_INFO(("Shutting down server..."));
+        if (s_signo) {
+            MG_INFO(("Shutting down server..."));
+            return;
+        }
+        
+        MG_INFO(("Client disconnected"));
     }
 }

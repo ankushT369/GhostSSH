@@ -1,0 +1,70 @@
+# ---- COMPILER ----
+CC = clang
+
+# ---- FLAGS ----
+CFLAGS = -Wall -Wextra -g -DMG_TLS=MG_TLS_OPENSSL
+LDFLAGS = -lssl -lcrypto
+
+# ---- DIRECTORIES ----
+BIN_DIR = bin
+OBJ_DIR = $(BIN_DIR)/obj
+
+# ---- OUTPUT ----
+BIN = $(BIN_DIR)/ghost-bsd-amd64
+
+# =========================================================
+# DEFAULT TARGET
+# =========================================================
+all: $(BIN)
+
+# =========================================================
+# OBJECT FILES
+# =========================================================
+$(OBJ_DIR)/mongoose.o: mongoose.c
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c mongoose.c -o $(OBJ_DIR)/mongoose.o
+
+$(OBJ_DIR)/ghost.o: ghost.c
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c ghost.c -o $(OBJ_DIR)/ghost.o
+
+$(OBJ_DIR)/util.o: util.c
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c util.c -o $(OBJ_DIR)/util.o
+
+$(OBJ_DIR)/ghost-server.o: ghost-server.c
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c ghost-server.c -o $(OBJ_DIR)/ghost-server.o
+
+$(OBJ_DIR)/ghost-client.o: ghost-client.c
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c ghost-client.c -o $(OBJ_DIR)/ghost-client.o
+
+# =========================================================
+# LINK
+# =========================================================
+$(BIN): \
+	$(OBJ_DIR)/mongoose.o \
+	$(OBJ_DIR)/ghost.o \
+	$(OBJ_DIR)/util.o \
+	$(OBJ_DIR)/ghost-server.o \
+	$(OBJ_DIR)/ghost-client.o
+	mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) \
+	$(OBJ_DIR)/mongoose.o \
+	$(OBJ_DIR)/ghost.o \
+	$(OBJ_DIR)/util.o \
+	$(OBJ_DIR)/ghost-server.o \
+	$(OBJ_DIR)/ghost-client.o \
+	$(LDFLAGS) \
+	-o $@
+
+# =========================================================
+# CLEAN
+# =========================================================
+clean:
+	rm -rf $(BIN_DIR)
+
+rebuild: clean all
+
+.PHONY: all clean rebuild

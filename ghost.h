@@ -53,6 +53,7 @@ extern int mode;
 extern const char* proto_str[LIMIT];
 extern char url_buffer[MAX_LEN];
 extern int upgrade_done;
+extern int s_signo;
 
 extern ghost_config config; // global configuration
 
