@@ -18,8 +18,16 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Build GhostSSH
-      run: make
-
+      run: |
+        if [ "$RUNNER_OS" = "macOS" ]; then 
+          make build \
+            CC=gcc \
+            BIN=bin/ghost-macos-arm64 \
+            CFLAGS="-Wall -Wextra -g -DMG_TLS=MG_TLS_OPENSSL -I$(brew --prefix openssl)/include" \
+            LDFLAGS="-L$(brew --prefix openssl)/lib -lssl -lcrypto"
+          else 
+            make 
+          fi
     - name: Make test script executable
       run: chmod +x test/test-cli.sh
 
