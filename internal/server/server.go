@@ -39,9 +39,10 @@ type GoSSHServer struct {
 }
 
 type GoSSHServerConfiguration struct {
-	Port    int
-	SSHPort int
-	Timeout time.Duration
+	Port     int
+	SSHPort  int
+	Timeout  time.Duration
+	MaxConns int
 }
 
 func NewGoSSHServer(config GoSSHServerConfiguration, logger log.Logger) *GoSSHServer {
@@ -59,6 +60,15 @@ func (gossh *GoSSHServer) Run() error {
 	mux := http.NewServeMux()
 	// '/ws' is the general endpoint for ssh connections
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		newSessionCounter := atomic.AddInt32(&gossh.activeSessions, 1)
+
+		if int64(newSessionCounter) > int64(gossh.conf.MaxConns) {
+			atomic.AddInt32(&gossh.activeSessions, -1)
+
+			http.Error(w, "maximum connections reached", http.StatusServiceUnavailable)
+			return
+		}
+
 		gossh.handleServerWebSocket(w, r)
 	})
 
@@ -166,8 +176,6 @@ func (gossh *GoSSHServer) handleServerStatus(w http.ResponseWriter, r *http.Requ
 
 func (gossh *GoSSHServer) runServerSession(s *tunnel.Session) {
 	defer s.Close()
-
-	atomic.AddInt32(&gossh.activeSessions, 1)
 	defer atomic.AddInt32(&gossh.activeSessions, -1)
 
 	var wg sync.WaitGroup

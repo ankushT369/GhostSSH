@@ -8,6 +8,7 @@ import (
 	"gossh/internal/log"
 	"gossh/internal/server"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -37,6 +38,7 @@ type Config struct {
 	wsURL          string
 	verbosity      log.LogLevel
 	daemon         bool
+	maxConns       int
 }
 
 func usage() {
@@ -105,16 +107,17 @@ func parseArgs(args []string) (Config, error) {
 	// We cannot use a normal bool flag for -vvv because the original CLI
 	// treats -v/-vv/-vvv as explicit verbosity levels.
 	var (
-		port    int
-		sshPort int
-		connect string
-		target  string
-		daemon  bool
-		quiet   bool
-		v       bool
-		vv      bool
-		vvv     bool
-		verbose bool
+		port     int
+		sshPort  int
+		connect  string
+		target   string
+		daemon   bool
+		maxConns int
+		quiet    bool
+		v        bool
+		vv       bool
+		vvv      bool
+		verbose  bool
 	)
 
 	fs.IntVar(&port, "port", 0, "port")
@@ -122,6 +125,7 @@ func parseArgs(args []string) (Config, error) {
 	fs.StringVar(&connect, "connect", "", "remote URL")
 	fs.StringVar(&target, "target", "", "remote URL")
 	fs.BoolVar(&daemon, "daemon", false, "daemonize")
+	fs.IntVar(&maxConns, "max-conns", math.MaxInt, "max-conns")
 	fs.BoolVar(&quiet, "quiet", false, "quiet")
 	fs.BoolVar(&v, "v", false, "info")
 	fs.BoolVar(&vv, "vv", false, "debug")
@@ -135,6 +139,8 @@ func parseArgs(args []string) (Config, error) {
 	if daemon {
 		cfg.daemon = true
 	}
+
+	cfg.maxConns = maxConns
 
 	if quiet {
 		cfg.verbosity = log.ERROR
@@ -214,6 +220,8 @@ func main() {
 						Port:    cfg.httpServerPort,
 						SSHPort: cfg.sshdPort,
 						Timeout: time.Second * 3,
+
+						MaxConns: cfg.maxConns,
 					},
 					logger,
 				).Run()
@@ -226,6 +234,8 @@ func main() {
 					Port:    cfg.httpServerPort,
 					SSHPort: cfg.sshdPort,
 					Timeout: time.Second * 3,
+
+					MaxConns: cfg.maxConns,
 				},
 				logger,
 			).Run()
